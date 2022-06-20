@@ -1,0 +1,11 @@
+version: v1
+plugins:
+  - name: go
+    out: todo_grpc
+    opt: paths=source_relative
+  - name: go-grpc
+    out: todo_grpc
+    opt: paths=source_relative,require_unimplemented_servers=false
+  # - name: grpc-gateway
+  #   out: protoTest
+  #   opt: paths=source_relative
