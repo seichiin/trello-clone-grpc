@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"todo-list/todo_grpc/proto/todo"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -26,7 +27,7 @@ type Todo struct {
 }
 
 func main() {
-	db, err := gorm.Open(mysql.Open("root:password@tcp(127.0.0.1:3306)/go_grpc?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open("root:akashi@tcp(127.0.0.1:3306)/go_grpc?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
 	fmt.Println(db.Name())
 	if err != nil {
 		panic("Failed to connect to database!")
@@ -34,10 +35,9 @@ func main() {
 
 	db.AutoMigrate(&Todo{})
 
-
 	// Create a listener on TCP port
 	lis, err := net.Listen("tcp", ":8080")
-	
+
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
@@ -48,7 +48,34 @@ func main() {
 	todo.RegisterTodoListServer(s, NewServer(db))
 	// Serve gRPC Server
 	log.Println("Serving gRPC on 0.0.0.0:8080")
-	log.Fatal(s.Serve(lis))
+	go func() {
+		log.Fatal(s.Serve(lis))
+	}()
+
+	conn, err := grpc.DialContext(
+		context.Background(),
+		"0.0.0.0:8080",
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		log.Fatalln("Failed to dial server:", err)
+	}
+
+	gwmux := runtime.NewServeMux()
+	// Register Greeter
+	err = todo.RegisterTodoListHandler(context.Background(), gwmux, conn)
+	if err != nil {
+		log.Fatalln("Failed to register gateway:", err)
+	}
+
+	gwServer := &http.Server{
+		Addr:    ":8090",
+		Handler: gwmux,
+	}
+
+	log.Println("Serving gRPC-Gateway on http://0.0.0.0:8090")
+	log.Fatalln(gwServer.ListenAndServe())
 }
 
 func NewServer(db *gorm.DB) *server {
@@ -56,69 +83,9 @@ func NewServer(db *gorm.DB) *server {
 		DB: db,
 	}
 }
-func (s *server) CreateTodoItem(_ context.Context, req *todo.TodoRequest) (*todo.Todo, error) {
-		if(req.Name == "") {
-		newTodo := Todo{
-			Name: req.Name,
-		}
 
-		s.DB.Create(newTodo)
-
-		return &todo.Todo {
-			Name: newTodo.Name,
-			Id: int32(newTodo.ID),
-		}, nil
-	}
-	
-	return nil, status.Errorf(codes.InvalidArgument, "Cannot create todo without name")
-}
-
-func (s *server) GetTodos(_ context.Context, _ *emptypb.Empty) (*todo.Todos, error) {
-		var todos []*todo.Todo
-
-	s.DB.Find(&todos)
-
-	return &todo.Todos{
-		Todos: todos,
-	}, nil
-}
-
-func (s *server) GetTodoById(_ context.Context, req *todo.TodoId) (*todo.Todo, error) {
-		var todo *todo.Todo
-	s.DB.Find(&todo, req.Id)
-
-	return todo, nil
-}
-
-func (s *server) DeleteTodo(_ context.Context, req *todo.TodoId) (*todo.DeleteTodoMessage, error) {
-		var deletedTodo *todo.Todo
-
-	res := s.DB.Delete(&deletedTodo, req.Id);
-
-	if res.Error != nil {
-		return nil, res.Error
-	}
-	if res.RowsAffected == 0 {
-		return &todo.DeleteTodoMessage{
-			Message: "Todo doesn't exist",
-		}, nil
-	}
-
-	return &todo.DeleteTodoMessage{
-		Message: "Successfully deleted todo",
-	}, nil
-}
-
-func (s *server) UpdateTodo(_ context.Context, req *todo.Todo) (*todo.Todo, error) {
-		var updatedTodo *todo.Todo
-		
-	s.DB.Find(&updatedTodo, req.Id);
-
-	if req.Id == 0 {
-		updatedTodo.Name = req.Name;
-	}
-
-	s.DB.Save(&updatedTodo)
-
-	return updatedTodo, nil
+func (s *server) GetTodos(context.Context, *emptypb.Empty) (*todo.Todos, error) {
+	var todolist []*todo.Todo
+	s.DB.Find(&todolist)
+	return &todo.Todos{Todos: todolist}, nil
 }
