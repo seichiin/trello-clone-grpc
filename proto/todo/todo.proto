@@ -7,6 +7,9 @@ import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
 
+
+import "google/api/http.proto"; //thiếu
+
 service TodoList {
   rpc CreateTodoItem (TodoRequest) returns (Todo) {
        option (google.api.http) = {
@@ -24,14 +27,12 @@ service TodoList {
   rpc GetTodoById (TodoId) returns (Todo) {
        option (google.api.http) = {
       get: "/v1/todo/{id}",
-      body: "*"
     };
   }
 
   rpc DeleteTodo (TodoId) returns (DeleteTodoMessage) {
     option (google.api.http) = {
    delete: "/v1/todo/{id}",
-   body: "*"
  };
 }
 
