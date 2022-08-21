@@ -1,4 +1,4 @@
-package main
+package todo
 
 import (
 	"context"
@@ -11,29 +11,24 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-type server struct {
+type Server struct {
 	todo.UnimplementedTodoListServer
 	DB *gorm.DB
 }
 
-type Todo struct {
-	gorm.Model
-	Name string
-}
-
 func main() {
-	db, err := gorm.Open(mysql.Open("root:akashi@tcp(127.0.0.1:3306)/go_grpc?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
+	dbConnection := "root:root@tcp(127.0.0.1:3306)/todolist_grpc?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dbConnection), &gorm.Config{})
 	fmt.Println(db.Name())
 	if err != nil {
 		panic("Failed to connect to database!")
 	}
 
-	db.AutoMigrate(&Todo{})
+	db.AutoMigrate(&todo.Todo{})
 
 	// Create a listener on TCP port
 	lis, err := net.Listen("tcp", ":8080")
@@ -78,14 +73,8 @@ func main() {
 	log.Fatalln(gwServer.ListenAndServe())
 }
 
-func NewServer(db *gorm.DB) *server {
-	return &server{
+func NewServer(db *gorm.DB) *Server {
+	return &Server{
 		DB: db,
 	}
-}
-
-func (s *server) GetTodos(context.Context, *emptypb.Empty) (*todo.Todos, error) {
-	var todolist []*todo.Todo
-	s.DB.Find(&todolist)
-	return &todo.Todos{Todos: todolist}, nil
 }

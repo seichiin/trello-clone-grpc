@@ -8,7 +8,7 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
 
 
-import "google/api/http.proto"; //thiếu
+import "google/api/http.proto";
 
 service TodoList {
   rpc CreateTodoItem (TodoRequest) returns (Todo) {
