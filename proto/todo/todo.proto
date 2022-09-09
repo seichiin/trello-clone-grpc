@@ -3,34 +3,33 @@ syntax = "proto3";
 package todo;
 
 option go_package = "v1/todo";
-import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
-
-
+import "google/protobuf/timestamp.proto";
 import "google/api/http.proto";
+import "google/api/annotations.proto";
 
-service TodoList {
-  rpc CreateTodoItem (TodoRequest) returns (Todo) {
+service TodoService {
+  rpc CreateTodo (Todo) returns (Todo) {
        option (google.api.http) = {
           post: "/v1/todo",
           body: "*"
     };
   }
 
-  rpc GetTodos (google.protobuf.Empty) returns (Todos) {
+  rpc GetTodos (google.protobuf.Empty) returns (GetTodosResponse) {
        option (google.api.http) = {
       get: "/v1/todo"
     };
   }
 
-  rpc GetTodoById (TodoId) returns (Todo) {
+  rpc GetTodoDetail (TodoDetailRequest) returns (Todo) {
        option (google.api.http) = {
       get: "/v1/todo/{id}",
     };
   }
 
-  rpc DeleteTodo (TodoId) returns (DeleteTodoMessage) {
+  rpc DeleteTodo (TodoDetailRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
    delete: "/v1/todo/{id}",
  };
@@ -45,22 +44,19 @@ service TodoList {
 }
 
 message Todo {
-  string name = 1;
-  int32 id = 2;
+  // Output only.
+  int64 id = 1;
+  string name = 2;
+  int32 priority = 3;
+  int64 board_id = 4;
+  google.protobuf.Timestamp expire_time = 5;
+  string description = 6;
 }
 
-message TodoRequest {
-  string name = 1;
+message TodoDetailRequest {
+  int64 id = 1;
 }
 
-message TodoId {
-  int32 id = 1;
-}
-
-message Todos {
+message GetTodosResponse {
   repeated Todo todos = 1;
-}
-
-message DeleteTodoMessage {
-  string message = 1;
 }

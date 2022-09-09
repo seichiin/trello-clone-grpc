@@ -6,7 +6,7 @@
   },
   "tags": [
     {
-      "name": "TodoList"
+      "name": "TodoService"
     }
   ],
   "consumes": [
@@ -18,12 +18,12 @@
   "paths": {
     "/v1/todo": {
       "get": {
-        "operationId": "TodoList_GetTodos",
+        "operationId": "TodoService_GetTodos",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/todoTodos"
+              "$ref": "#/definitions/todoGetTodosResponse"
             }
           },
           "default": {
@@ -34,11 +34,11 @@
           }
         },
         "tags": [
-          "TodoList"
+          "TodoService"
         ]
       },
       "post": {
-        "operationId": "TodoList_CreateTodoItem",
+        "operationId": "TodoService_CreateTodo",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -59,18 +59,18 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/todoTodoRequest"
+              "$ref": "#/definitions/todoTodo"
             }
           }
         ],
         "tags": [
-          "TodoList"
+          "TodoService"
         ]
       }
     },
     "/v1/todo/{id}": {
       "get": {
-        "operationId": "TodoList_GetTodoById",
+        "operationId": "TodoService_GetTodoDetail",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -90,21 +90,22 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
-          "TodoList"
+          "TodoService"
         ]
       },
       "delete": {
-        "operationId": "TodoList_DeleteTodo",
+        "operationId": "TodoService_DeleteTodo",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/todoDeleteTodoMessage"
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -119,16 +120,16 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
-          "TodoList"
+          "TodoService"
         ]
       },
       "put": {
-        "operationId": "TodoList_UpdateTodo",
+        "operationId": "TodoService_UpdateTodo",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -146,10 +147,11 @@
         "parameters": [
           {
             "name": "id",
+            "description": "Output only.",
             "in": "path",
             "required": true,
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "int64"
           },
           {
             "name": "body",
@@ -160,13 +162,28 @@
               "properties": {
                 "name": {
                   "type": "string"
+                },
+                "priority": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "boardId": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "expireTime": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "description": {
+                  "type": "string"
                 }
               }
             }
           }
         ],
         "tags": [
-          "TodoList"
+          "TodoService"
         ]
       }
     }
@@ -199,35 +216,7 @@
         }
       }
     },
-    "todoDeleteTodoMessage": {
-      "type": "object",
-      "properties": {
-        "message": {
-          "type": "string"
-        }
-      }
-    },
-    "todoTodo": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "id": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "todoTodoRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "todoTodos": {
+    "todoGetTodosResponse": {
       "type": "object",
       "properties": {
         "todos": {
@@ -235,6 +224,35 @@
           "items": {
             "$ref": "#/definitions/todoTodo"
           }
+        }
+      }
+    },
+    "todoTodo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "description": "Output only.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "boardId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "expireTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
         }
       }
     }
