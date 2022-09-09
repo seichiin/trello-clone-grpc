@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package todo;
+
+option go_package = "v1/todo";
+import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/http.proto";
+import "google/api/annotations.proto";
+
+service BoardService {
+    rpc CreateBoard (Board) returns (Board) {
+         option (google.api.http) = {
+            post: "/v1/board",
+            body: "*"
+      };
+    }
+  
+    rpc GetBoards (google.protobuf.Empty) returns (GetBoardsResponse) {
+         option (google.api.http) = {
+        get: "/v1/board"
+      };
+    }
+  
+    rpc GetBoardDetail (BoardDetailRequest) returns (Board) {
+         option (google.api.http) = {
+        get: "/v1/board/{id}",
+      };
+    }
+  
+    rpc DeleteBoard (BoardDetailRequest) returns (google.protobuf.Empty) {
+      option (google.api.http) = {
+     delete: "/v1/board/{id}",
+   };
+  }
+  
+    rpc UpdateBoard (Board) returns (Board) {
+      option (google.api.http) = {
+     put: "/v1/board/{id}",
+     body: "*"
+   };
+  }
+  }
+
+  message GetBoardsResponse {
+    repeated Board boards = 1;
+  }
+
+  message Board {
+    // Output only.
+    int64 id = 1;
+    string name = 2;
+    int32 order = 3;
+  }
+
+  message BoardDetailRequest {
+    int64 id = 1;
+  }
+  
