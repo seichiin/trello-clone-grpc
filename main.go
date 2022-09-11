@@ -35,7 +35,7 @@ func main() {
 	lis, err := net.Listen("tcp", ":8080")
 
 	if err != nil {
-		log.Fatalln("Failed to listen:", err)
+		log.Fatalln("Failed ddd to listen:", err)
 	}
 
 	s := grpc.NewServer()
