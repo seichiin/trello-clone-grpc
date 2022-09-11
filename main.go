@@ -54,7 +54,7 @@ func main() {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		log.Fatalln("Failed to dial server:", err)
+		log.Fatalln("Failed tooo dial server:", err)
 	}
 
 	gwmux := runtime.NewServeMux()
