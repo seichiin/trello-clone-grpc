@@ -16,6 +16,7 @@ import (
 )
 
 type Server struct {
+	todo.UnimplementedUserServiceServer
 	todo.UnimplementedTodoServiceServer
 	todo.UnimplementedBoardServiceServer
 	DB *gorm.DB
@@ -25,7 +26,7 @@ func main() {
 	dbName := "todolist_grpc"
 	dbConnection := fmt.Sprintf("root:root@tcp(127.0.0.1:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbName)
 	db, err := gorm.Open(mysql.Open(dbConnection), &gorm.Config{})
-	fmt.Println(db.Name())
+	
 	if err != nil {
 		panic("Failed to connect to database!")
 	}
@@ -40,6 +41,12 @@ func main() {
 
 	s := grpc.NewServer()
 	todo.RegisterTodoServiceServer(s, &Server{
+		DB: db,
+	})
+	todo.RegisterBoardServiceServer(s, &Server{
+		DB: db,
+	})
+	todo.RegisterUserServiceServer(s, &Server{
 		DB: db,
 	})
 	log.Println("Serving gRPC on 0.0.0.0:8080")
@@ -59,6 +66,14 @@ func main() {
 
 	gwmux := runtime.NewServeMux()
 	err = todo.RegisterTodoServiceHandler(context.Background(), gwmux, conn)
+	if err != nil {
+		log.Fatalln("Failed to register gateway:", err)
+	}
+	err = todo.RegisterBoardServiceHandler(context.Background(), gwmux, conn)
+	if err != nil {
+		log.Fatalln("Failed to register gateway:", err)
+	}
+	err = todo.RegisterUserServiceHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}
