@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package todo;
+
+option go_package = "v1/todo";
+import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/http.proto";
+import "google/api/annotations.proto";
+
+service UserService {
+  rpc SignUp (User) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+       post: "/v1/signUp",
+       body: "*"
+    };
+}
+  rpc SignIn (User) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+        post: "/v1/signIn"
+        body: "*"
+    };
+  }
+}
+
+message User {
+  // Output only.
+  int64 id = 1;
+  string username = 2;
+  string password = 3;
+}

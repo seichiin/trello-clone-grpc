@@ -10,7 +10,7 @@ import (
 type (
 	User struct {
 		ID       int64  `gorm:"primaryKey;autoIncrement:true"`
-		UserName string `gorm:"size:40"`
+		UserName string `gorm:"size:40;unique"`
 		Password string
 	}
 	Board struct {
