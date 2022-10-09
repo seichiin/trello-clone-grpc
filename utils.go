@@ -2,6 +2,7 @@ package main
 
 import (
 	"html"
+	"net/mail"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -19,4 +20,9 @@ func CheckPasswordHash(hashedPassword, password string) error {
 func Santize(data string) string{
 	data = html.EscapeString(strings.TrimSpace(data))
 	return data
+}
+
+func ValidateEmail(email string) bool {
+	_, err := mail.ParseAddress(email)
+	return err == nil
 }

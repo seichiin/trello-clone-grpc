@@ -175,7 +175,14 @@
                   "type": "string",
                   "format": "date-time"
                 },
+                "startTime": {
+                  "type": "string",
+                  "format": "date-time"
+                },
                 "description": {
+                  "type": "string"
+                },
+                "color": {
                   "type": "string"
                 }
               }
@@ -251,7 +258,14 @@
           "type": "string",
           "format": "date-time"
         },
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
         "description": {
+          "type": "string"
+        },
+        "color": {
           "type": "string"
         }
       }

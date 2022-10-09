@@ -125,6 +125,9 @@
         },
         "password": {
           "type": "string"
+        },
+        "email": {
+          "type": "string"
         }
       }
     }

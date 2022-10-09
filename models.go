@@ -11,7 +11,8 @@ type (
 	User struct {
 		ID       int64  `gorm:"primaryKey;autoIncrement:true"`
 		UserName string `gorm:"size:40;unique"`
-		Password string
+		Password string `gorm:"not null"`
+		Email    string `gorm:"unique;not null"`
 	}
 	Board struct {
 		ID int64 `gorm:"primaryKey;autoIncrement:true"`
@@ -28,11 +29,13 @@ type (
 		Board   Board `gorm:"foreignKey:BoardID;constraint:OnDelete:CASCADE"`
 		BoardID int64
 
-		Name        string `gorm:"not null;unique"`
-		Priority    int32  `gorm:"not null"`
+		Name     string `gorm:"not null;unique"`
+		Priority int32  `gorm:"not null"`
 
+		StartTime   time.Time
 		ExpireTime  time.Time
 		Description string `gorm:"size:120"`
+		Color       string
 	}
 )
 
@@ -50,8 +53,10 @@ func (t *Todo) Proto() *todo.Todo {
 		BoardId:     t.BoardID,
 		Name:        t.Name,
 		Priority:    t.Priority,
+		StartTime:   timestamppb.New(t.ExpireTime),
 		ExpireTime:  timestamppb.New(t.ExpireTime),
 		Description: t.Description,
+		Color:       t.Color,
 	}
 }
 
@@ -59,6 +64,8 @@ func (t *Todo) FromProto(v1 *todo.Todo) {
 	t.BoardID = v1.BoardId
 	t.Name = v1.Name
 	t.Priority = v1.Priority
+	t.StartTime = v1.ExpireTime.AsTime()
 	t.ExpireTime = v1.ExpireTime.AsTime()
 	t.Description = v1.Description
+	t.Color = v1.Color
 }
