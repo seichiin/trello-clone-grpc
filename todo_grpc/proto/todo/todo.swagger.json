@@ -175,6 +175,10 @@
                   "type": "string",
                   "format": "date-time"
                 },
+                "startTime": {
+                  "type": "string",
+                  "format": "date-time"
+                },
                 "description": {
                   "type": "string"
                 }
@@ -248,6 +252,10 @@
           "format": "int64"
         },
         "expireTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "startTime": {
           "type": "string",
           "format": "date-time"
         },

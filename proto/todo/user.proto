@@ -29,4 +29,5 @@ message User {
   int64 id = 1;
   string username = 2;
   string password = 3;
+  string email = 4;
 }

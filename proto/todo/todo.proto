@@ -50,7 +50,8 @@ message Todo {
   int32 priority = 3;
   int64 board_id = 4;
   google.protobuf.Timestamp expire_time = 5;
-  string description = 6;
+  google.protobuf.Timestamp start_time = 6;
+  string description = 7;
 }
 
 message TodoDetailRequest {
