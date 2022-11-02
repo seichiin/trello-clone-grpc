@@ -9,8 +9,12 @@
       "name": "TodoService"
     }
   ],
-  "consumes": ["application/json"],
-  "produces": ["application/json"],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
   "paths": {
     "/v1/{boardId}/todo": {
       "post": {
@@ -83,7 +87,9 @@
             }
           }
         ],
-        "tags": ["TodoService"]
+        "tags": [
+          "TodoService"
+        ]
       }
     },
     "/v1/{boardId}/todo/{todo.id}": {
@@ -172,7 +178,9 @@
             }
           }
         ],
-        "tags": ["TodoService"]
+        "tags": [
+          "TodoService"
+        ]
       }
     },
     "/v1/{boardId}/todos": {
@@ -219,7 +227,9 @@
             "type": "string"
           }
         ],
-        "tags": ["TodoService"]
+        "tags": [
+          "TodoService"
+        ]
       }
     },
     "/v1/{boardId}/todos/{id}": {
@@ -255,7 +265,9 @@
             "format": "int64"
           }
         ],
-        "tags": ["TodoService"]
+        "tags": [
+          "TodoService"
+        ]
       },
       "delete": {
         "operationId": "TodoService_DeleteTodo",
@@ -290,14 +302,20 @@
             "format": "int64"
           }
         ],
-        "tags": ["TodoService"]
+        "tags": [
+          "TodoService"
+        ]
       }
     }
   },
   "definitions": {
     "TodoPriority": {
       "type": "string",
-      "enum": ["LOW", "MEDIUM", "HIGH"],
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
       "default": "LOW"
     },
     "protobufAny": {
