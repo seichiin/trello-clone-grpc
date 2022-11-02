@@ -8,39 +8,38 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/api/http.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
 
 service BoardService {
     rpc CreateBoard (Board) returns (Board) {
          option (google.api.http) = {
-            post: "/v1/board",
+            post: "/v1/{user_id}/board",
             body: "*"
       };
     }
   
-    rpc GetBoards (google.protobuf.Empty) returns (GetBoardsResponse) {
+    rpc GetBoards (GetBoardsRequest) returns (GetBoardsResponse) {
          option (google.api.http) = {
-        get: "/v1/board"
-      };
-    }
-  
-    rpc GetBoardDetail (BoardDetailRequest) returns (Board) {
-         option (google.api.http) = {
-        get: "/v1/board/{id}",
+        get: "/v1/{user_id}/boards"
       };
     }
   
     rpc DeleteBoard (BoardDetailRequest) returns (google.protobuf.Empty) {
       option (google.api.http) = {
-     delete: "/v1/board/{id}",
+     delete: "/v1/{user_id}/boards/{id}",
    };
   }
   
-    rpc UpdateBoard (Board) returns (Board) {
+    rpc UpdateBoard (UpdateBoardRequest) returns (Board) {
       option (google.api.http) = {
-     put: "/v1/board/{id}",
+     patch: "/v1/{user_id}/board/{board.id}",
      body: "*"
    };
   }
+  }
+
+  message GetBoardsRequest {
+    int64 user_id = 1;
   }
 
   message GetBoardsResponse {
@@ -51,11 +50,21 @@ service BoardService {
     // Output only.
     int64 id = 1;
     string name = 2;
+    // Output only.
     int32 order = 3;
     int64 user_id = 7;
   }
 
   message BoardDetailRequest {
     int64 id = 1;
+    int64 user_id = 2;
+  }
+
+  message UpdateBoardRequest {
+    Board board = 1;
+    int64 user_id = 2;
+
+  // Fields to update.
+  google.protobuf.FieldMask update_mask = 3;
   }
   

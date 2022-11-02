@@ -12,13 +12,20 @@ import "google/api/annotations.proto";
 service UserService {
   rpc SignUp (User) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-       post: "/v1/signUp",
+       post: "/v1/user/signUp",
        body: "*"
     };
 }
   rpc SignIn (User) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-        post: "/v1/signIn"
+        post: "/v1/user/signIn"
+        body: "*"
+    };
+  }
+
+  rpc ChangePassword (User) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+        put: "/v1/user/changePassword"
         body: "*"
     };
   }

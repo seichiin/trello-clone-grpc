@@ -8,57 +8,81 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/api/http.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
 
 service TodoService {
-  rpc CreateTodo (Todo) returns (Todo) {
+  rpc GetTodos (GetTodosRequest) returns (GetTodosResponse) {
        option (google.api.http) = {
-          post: "/v1/todo",
-          body: "*"
-    };
-  }
-
-  rpc GetTodos (google.protobuf.Empty) returns (GetTodosResponse) {
-       option (google.api.http) = {
-      get: "/v1/todo"
+      get: "/v1/{board_id}/todos",
     };
   }
 
   rpc GetTodoDetail (TodoDetailRequest) returns (Todo) {
        option (google.api.http) = {
-      get: "/v1/todo/{id}",
+      get: "/v1/{board_id}/todos/{id}",
     };
   }
 
   rpc DeleteTodo (TodoDetailRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-   delete: "/v1/todo/{id}",
+   delete: "/v1/{board_id}/todos/{id}",
  };
+}
+  rpc CreateTodo (Todo) returns (Todo) {
+    option (google.api.http) = {
+      post: "/v1/{board_id}/todo",
+      body: "*"
+  };
+  }
+
+  rpc UpdateTodo (UpdateTodoRequest) returns (Todo) {
+    option (google.api.http) = {
+    patch: "/v1/{board_id}/todo/{todo.id}",
+    body: "*"
+ };
+}
 }
 
-  rpc UpdateTodo (Todo) returns (Todo) {
-    option (google.api.http) = {
-   put: "/v1/todo/{id}",
-   body: "*"
- };
-}
+message GetTodosRequest {
+  string filter_name = 1;
+  string filter_priority = 2;
+  string filter_completed = 3;
+  int64 board_id = 4;
 }
 
 message Todo {
+  enum Priority {
+    LOW = 0;
+    MEDIUM = 1;
+    HIGH = 2;
+  }
   // Output only.
   int64 id = 1;
   string name = 2;
-  int32 priority = 3;
+  Priority priority = 3;
   int64 board_id = 4;
   google.protobuf.Timestamp expire_time = 5;
   google.protobuf.Timestamp start_time = 6;
   string description = 7;
   string color = 8;
+  // Output only.
+  int32 order = 9;
+  bool completed = 10;
 }
 
 message TodoDetailRequest {
   int64 id = 1;
+  int64 board_id = 2;
 }
 
 message GetTodosResponse {
   repeated Todo todos = 1;
+}
+
+message UpdateTodoRequest {
+  Todo todo = 1;
+  int64 board_id = 2;
+
+  // Fields to update.
+  google.protobuf.FieldMask update_mask = 3;
 }
