@@ -16,27 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/v1/board": {
-      "get": {
-        "operationId": "BoardService_GetBoards",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/todoGetBoardsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "BoardService"
-        ]
-      },
+    "/v1/{userId}/board": {
       "post": {
         "operationId": "BoardService_CreateBoard",
         "responses": {
@@ -55,11 +35,35 @@
         },
         "parameters": [
           {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/todoBoard"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "int64",
+                  "description": "Output only.",
+                  "readOnly": true
+                },
+                "name": {
+                  "type": "string"
+                },
+                "order": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Output only.",
+                  "readOnly": true
+                }
+              }
             }
           }
         ],
@@ -68,9 +72,9 @@
         ]
       }
     },
-    "/v1/board/{id}": {
-      "get": {
-        "operationId": "BoardService_GetBoardDetail",
+    "/v1/{userId}/board/{board.id}": {
+      "patch": {
+        "operationId": "BoardService_UpdateBoard",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -87,7 +91,78 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "board.id",
+            "description": "Output only.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "board": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "order": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Output only.",
+                      "readOnly": true
+                    },
+                    "userId": {
+                      "type": "string",
+                      "format": "int64"
+                    }
+                  }
+                },
+                "updateMask": {
+                  "type": "string",
+                  "description": "Fields to update."
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "BoardService"
+        ]
+      }
+    },
+    "/v1/{userId}/boards": {
+      "get": {
+        "operationId": "BoardService_GetBoards",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/todoGetBoardsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
             "in": "path",
             "required": true,
             "type": "string",
@@ -97,7 +172,9 @@
         "tags": [
           "BoardService"
         ]
-      },
+      }
+    },
+    "/v1/{userId}/boards/{id}": {
       "delete": {
         "operationId": "BoardService_DeleteBoard",
         "responses": {
@@ -117,62 +194,18 @@
         },
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "BoardService"
-        ]
-      },
-      "put": {
-        "operationId": "BoardService_UpdateBoard",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/todoBoard"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "Output only.",
+            "name": "userId",
             "in": "path",
             "required": true,
             "type": "string",
             "format": "int64"
           },
           {
-            "name": "body",
-            "in": "body",
+            "name": "id",
+            "in": "path",
             "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "order": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "userId": {
-                  "type": "string",
-                  "format": "int64"
-                }
-              }
-            }
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -223,7 +256,9 @@
         },
         "order": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Output only.",
+          "readOnly": true
         },
         "userId": {
           "type": "string",

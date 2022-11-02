@@ -20,10 +20,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BoardServiceClient interface {
 	CreateBoard(ctx context.Context, in *Board, opts ...grpc.CallOption) (*Board, error)
-	GetBoards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetBoardsResponse, error)
-	GetBoardDetail(ctx context.Context, in *BoardDetailRequest, opts ...grpc.CallOption) (*Board, error)
+	GetBoards(ctx context.Context, in *GetBoardsRequest, opts ...grpc.CallOption) (*GetBoardsResponse, error)
 	DeleteBoard(ctx context.Context, in *BoardDetailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	UpdateBoard(ctx context.Context, in *Board, opts ...grpc.CallOption) (*Board, error)
+	UpdateBoard(ctx context.Context, in *UpdateBoardRequest, opts ...grpc.CallOption) (*Board, error)
 }
 
 type boardServiceClient struct {
@@ -43,18 +42,9 @@ func (c *boardServiceClient) CreateBoard(ctx context.Context, in *Board, opts ..
 	return out, nil
 }
 
-func (c *boardServiceClient) GetBoards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetBoardsResponse, error) {
+func (c *boardServiceClient) GetBoards(ctx context.Context, in *GetBoardsRequest, opts ...grpc.CallOption) (*GetBoardsResponse, error) {
 	out := new(GetBoardsResponse)
 	err := c.cc.Invoke(ctx, "/todo.BoardService/GetBoards", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *boardServiceClient) GetBoardDetail(ctx context.Context, in *BoardDetailRequest, opts ...grpc.CallOption) (*Board, error) {
-	out := new(Board)
-	err := c.cc.Invoke(ctx, "/todo.BoardService/GetBoardDetail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +60,7 @@ func (c *boardServiceClient) DeleteBoard(ctx context.Context, in *BoardDetailReq
 	return out, nil
 }
 
-func (c *boardServiceClient) UpdateBoard(ctx context.Context, in *Board, opts ...grpc.CallOption) (*Board, error) {
+func (c *boardServiceClient) UpdateBoard(ctx context.Context, in *UpdateBoardRequest, opts ...grpc.CallOption) (*Board, error) {
 	out := new(Board)
 	err := c.cc.Invoke(ctx, "/todo.BoardService/UpdateBoard", in, out, opts...)
 	if err != nil {
@@ -84,10 +74,9 @@ func (c *boardServiceClient) UpdateBoard(ctx context.Context, in *Board, opts ..
 // for forward compatibility
 type BoardServiceServer interface {
 	CreateBoard(context.Context, *Board) (*Board, error)
-	GetBoards(context.Context, *emptypb.Empty) (*GetBoardsResponse, error)
-	GetBoardDetail(context.Context, *BoardDetailRequest) (*Board, error)
+	GetBoards(context.Context, *GetBoardsRequest) (*GetBoardsResponse, error)
 	DeleteBoard(context.Context, *BoardDetailRequest) (*emptypb.Empty, error)
-	UpdateBoard(context.Context, *Board) (*Board, error)
+	UpdateBoard(context.Context, *UpdateBoardRequest) (*Board, error)
 }
 
 // UnimplementedBoardServiceServer should be embedded to have forward compatible implementations.
@@ -97,16 +86,13 @@ type UnimplementedBoardServiceServer struct {
 func (UnimplementedBoardServiceServer) CreateBoard(context.Context, *Board) (*Board, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBoard not implemented")
 }
-func (UnimplementedBoardServiceServer) GetBoards(context.Context, *emptypb.Empty) (*GetBoardsResponse, error) {
+func (UnimplementedBoardServiceServer) GetBoards(context.Context, *GetBoardsRequest) (*GetBoardsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBoards not implemented")
-}
-func (UnimplementedBoardServiceServer) GetBoardDetail(context.Context, *BoardDetailRequest) (*Board, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBoardDetail not implemented")
 }
 func (UnimplementedBoardServiceServer) DeleteBoard(context.Context, *BoardDetailRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteBoard not implemented")
 }
-func (UnimplementedBoardServiceServer) UpdateBoard(context.Context, *Board) (*Board, error) {
+func (UnimplementedBoardServiceServer) UpdateBoard(context.Context, *UpdateBoardRequest) (*Board, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateBoard not implemented")
 }
 
@@ -140,7 +126,7 @@ func _BoardService_CreateBoard_Handler(srv interface{}, ctx context.Context, dec
 }
 
 func _BoardService_GetBoards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(GetBoardsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -152,25 +138,7 @@ func _BoardService_GetBoards_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/todo.BoardService/GetBoards",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BoardServiceServer).GetBoards(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BoardService_GetBoardDetail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BoardDetailRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BoardServiceServer).GetBoardDetail(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/todo.BoardService/GetBoardDetail",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BoardServiceServer).GetBoardDetail(ctx, req.(*BoardDetailRequest))
+		return srv.(BoardServiceServer).GetBoards(ctx, req.(*GetBoardsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -194,7 +162,7 @@ func _BoardService_DeleteBoard_Handler(srv interface{}, ctx context.Context, dec
 }
 
 func _BoardService_UpdateBoard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Board)
+	in := new(UpdateBoardRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -206,7 +174,7 @@ func _BoardService_UpdateBoard_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/todo.BoardService/UpdateBoard",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BoardServiceServer).UpdateBoard(ctx, req.(*Board))
+		return srv.(BoardServiceServer).UpdateBoard(ctx, req.(*UpdateBoardRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -225,10 +193,6 @@ var BoardService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBoards",
 			Handler:    _BoardService_GetBoards_Handler,
-		},
-		{
-			MethodName: "GetBoardDetail",
-			Handler:    _BoardService_GetBoardDetail_Handler,
 		},
 		{
 			MethodName: "DeleteBoard",

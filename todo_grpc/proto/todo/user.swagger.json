@@ -16,7 +16,40 @@
     "application/json"
   ],
   "paths": {
-    "/v1/signIn": {
+    "/v1/user/changePassword": {
+      "put": {
+        "operationId": "UserService_ChangePassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/todoUser"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/v1/user/signIn": {
       "post": {
         "operationId": "UserService_SignIn",
         "responses": {
@@ -49,7 +82,7 @@
         ]
       }
     },
-    "/v1/signUp": {
+    "/v1/user/signUp": {
       "post": {
         "operationId": "UserService_SignUp",
         "responses": {

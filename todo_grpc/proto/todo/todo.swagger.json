@@ -9,34 +9,10 @@
       "name": "TodoService"
     }
   ],
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
   "paths": {
-    "/v1/todo": {
-      "get": {
-        "operationId": "TodoService_GetTodos",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/todoGetTodosResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "TodoService"
-        ]
-      },
+    "/v1/{boardId}/todo": {
       "post": {
         "operationId": "TodoService_CreateTodo",
         "responses": {
@@ -55,20 +31,198 @@
         },
         "parameters": [
           {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/todoTodo"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "int64",
+                  "description": "Output only.",
+                  "readOnly": true
+                },
+                "name": {
+                  "type": "string"
+                },
+                "priority": {
+                  "$ref": "#/definitions/TodoPriority"
+                },
+                "expireTime": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "startTime": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "color": {
+                  "type": "string"
+                },
+                "order": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Output only.",
+                  "readOnly": true
+                },
+                "completed": {
+                  "type": "boolean"
+                }
+              }
             }
           }
         ],
-        "tags": [
-          "TodoService"
-        ]
+        "tags": ["TodoService"]
       }
     },
-    "/v1/todo/{id}": {
+    "/v1/{boardId}/todo/{todo.id}": {
+      "patch": {
+        "operationId": "TodoService_UpdateTodo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/todoTodo"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "todo.id",
+            "description": "Output only.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "todo": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "priority": {
+                      "$ref": "#/definitions/TodoPriority"
+                    },
+                    "boardId": {
+                      "type": "string",
+                      "format": "int64"
+                    },
+                    "expireTime": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "startTime": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "color": {
+                      "type": "string"
+                    },
+                    "order": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Output only.",
+                      "readOnly": true
+                    },
+                    "completed": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "updateMask": {
+                  "type": "string",
+                  "description": "Fields to update."
+                }
+              }
+            }
+          }
+        ],
+        "tags": ["TodoService"]
+      }
+    },
+    "/v1/{boardId}/todos": {
+      "get": {
+        "operationId": "TodoService_GetTodos",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/todoGetTodosResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "filterName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filterPriority",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filterCompleted",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": ["TodoService"]
+      }
+    },
+    "/v1/{boardId}/todos/{id}": {
       "get": {
         "operationId": "TodoService_GetTodoDetail",
         "responses": {
@@ -87,6 +241,13 @@
         },
         "parameters": [
           {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
             "name": "id",
             "in": "path",
             "required": true,
@@ -94,9 +255,7 @@
             "format": "int64"
           }
         ],
-        "tags": [
-          "TodoService"
-        ]
+        "tags": ["TodoService"]
       },
       "delete": {
         "operationId": "TodoService_DeleteTodo",
@@ -117,6 +276,13 @@
         },
         "parameters": [
           {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
             "name": "id",
             "in": "path",
             "required": true,
@@ -124,78 +290,16 @@
             "format": "int64"
           }
         ],
-        "tags": [
-          "TodoService"
-        ]
-      },
-      "put": {
-        "operationId": "TodoService_UpdateTodo",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/todoTodo"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "Output only.",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "priority": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "boardId": {
-                  "type": "string",
-                  "format": "int64"
-                },
-                "expireTime": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "startTime": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "description": {
-                  "type": "string"
-                },
-                "color": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "tags": [
-          "TodoService"
-        ]
+        "tags": ["TodoService"]
       }
     }
   },
   "definitions": {
+    "TodoPriority": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH"],
+      "default": "LOW"
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -247,8 +351,7 @@
           "type": "string"
         },
         "priority": {
-          "type": "integer",
-          "format": "int32"
+          "$ref": "#/definitions/TodoPriority"
         },
         "boardId": {
           "type": "string",
@@ -267,6 +370,15 @@
         },
         "color": {
           "type": "string"
+        },
+        "order": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Output only.",
+          "readOnly": true
+        },
+        "completed": {
+          "type": "boolean"
         }
       }
     }
