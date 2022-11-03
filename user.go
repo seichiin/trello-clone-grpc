@@ -72,3 +72,17 @@ func (s *Server) ChangePassword(ctx context.Context, req *todo.User) (*emptypb.E
 
 	return &emptypb.Empty{}, nil
 }
+
+func (s *Server) GetUser(ctx context.Context, req *todo.GetUserRequest) (*todo.User, error) {
+	user := User{}
+	
+	tx := s.DB.Where("id = ?", req.Id).Limit(1).Find(&user)
+	if tx.Error != nil {
+		return nil, fmt.Errorf("Internal Server Error: %v", tx.Error)
+	}
+	if tx.RowsAffected == 0 {
+		return nil, fmt.Errorf("User not found!")
+	}
+
+	return user.Proto(), nil
+}

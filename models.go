@@ -88,6 +88,15 @@ func (t *Todo) Proto() *todo.Todo {
 	}
 }
 
+func (u *User) Proto() *todo.User {
+	return &todo.User{
+		Id:       u.ID,
+		Username: u.UserName,
+		Password: u.Password,
+		Email:    u.Email,
+	}
+}
+
 func (t *Todo) FromProto(v1 *todo.Todo) {
 	t.ID = v1.Id
 	t.BoardID = v1.BoardId
