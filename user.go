@@ -38,7 +38,7 @@ func (s *Server) SignUp(ctx context.Context, req *todo.User) (*emptypb.Empty, er
 	return &emptypb.Empty{}, nil
 }
 
-func (s *Server) SignIn(ctx context.Context, req *todo.User) (*emptypb.Empty, error) {
+func (s *Server) SignIn(ctx context.Context, req *todo.User) (*todo.User, error) {
 	user := User{}
 	tx := s.DB.Where("user_name = ? OR email = ?", req.Username, req.Email).Limit(1).Find(&user)
 	if tx.Error != nil {
@@ -53,7 +53,7 @@ func (s *Server) SignIn(ctx context.Context, req *todo.User) (*emptypb.Empty, er
 		return nil, errors.New("Password is invalid!")
 	}
 
-	return &emptypb.Empty{}, nil
+	return user.Proto(), nil
 }
 
 func (s *Server) ChangePassword(ctx context.Context, req *todo.User) (*emptypb.Empty, error) {

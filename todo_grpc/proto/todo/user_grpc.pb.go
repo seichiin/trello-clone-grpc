@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	SignUp(ctx context.Context, in *User, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	SignIn(ctx context.Context, in *User, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SignIn(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	ChangePassword(ctx context.Context, in *User, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
 }
@@ -42,8 +42,8 @@ func (c *userServiceClient) SignUp(ctx context.Context, in *User, opts ...grpc.C
 	return out, nil
 }
 
-func (c *userServiceClient) SignIn(ctx context.Context, in *User, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *userServiceClient) SignIn(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
 	err := c.cc.Invoke(ctx, "/todo.UserService/SignIn", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (c *userServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opt
 // for forward compatibility
 type UserServiceServer interface {
 	SignUp(context.Context, *User) (*emptypb.Empty, error)
-	SignIn(context.Context, *User) (*emptypb.Empty, error)
+	SignIn(context.Context, *User) (*User, error)
 	ChangePassword(context.Context, *User) (*emptypb.Empty, error)
 	GetUser(context.Context, *GetUserRequest) (*User, error)
 }
@@ -86,7 +86,7 @@ type UnimplementedUserServiceServer struct {
 func (UnimplementedUserServiceServer) SignUp(context.Context, *User) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignUp not implemented")
 }
-func (UnimplementedUserServiceServer) SignIn(context.Context, *User) (*emptypb.Empty, error) {
+func (UnimplementedUserServiceServer) SignIn(context.Context, *User) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
 }
 func (UnimplementedUserServiceServer) ChangePassword(context.Context, *User) (*emptypb.Empty, error) {

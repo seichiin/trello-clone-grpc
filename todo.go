@@ -96,7 +96,7 @@ func (s *Server) UpdateTodo(ctx context.Context, req *todo.UpdateTodoRequest) (*
 	todo := Todo{}
 	todo.FromProto(req.Todo)
 
-	tx := s.DB.Model(&todo).Select(maskes).Where(&Todo{ID: req.Todo.Id}).Updates(&todo)
+	tx := s.DB.Model(&todo).Select(maskes).Where(&Todo{ID: req.Todo.Id, BoardID: req.BoardId}).Updates(&todo)
 	if tx.Error != nil {
 		return nil, fmt.Errorf("Internal Server Error: %v",tx.Error)
 	}
@@ -126,6 +126,8 @@ func (s *Server) CreateTodo(ctx context.Context, req *todo.Todo) (*todo.Todo, er
 	todo := &Todo{}
 	todo.FromProto(req)
 	todo.Order = maxOrder + 1
+	todo.Completed = false
+	todo.Priority = "LOW"
 
 	tx = s.DB.Create(todo)
 	if tx.Error != nil {

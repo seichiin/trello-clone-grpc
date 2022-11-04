@@ -16,7 +16,7 @@ service UserService {
        body: "*"
     };
 }
-  rpc SignIn (User) returns (google.protobuf.Empty) {
+  rpc SignIn (User) returns (User) {
     option (google.api.http) = {
         post: "/v1/user/signIn"
         body: "*"
