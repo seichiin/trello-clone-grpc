@@ -17,16 +17,25 @@ func (s *Server) GetTodos(ctx context.Context, req *todo.GetTodosRequest) (*todo
 
 	if req.FilterName != "" {
 		tx = tx.Where("name LIKE ?", "%"+req.FilterName+"%")
+		if tx.Error != nil {
+			return nil, fmt.Errorf("Internal Server Error!")
+		}
 	}
 	if req.FilterPriority != "" {
 		tx = tx.Where("priority LIKE ?", "%"+req.FilterPriority+"%")
+		if tx.Error != nil {
+			return nil, fmt.Errorf("Internal Server Error!")
+		}
 	}
 	if req.FilterCompleted != "" {
 		tx = tx.Where("completed LIKE ?", "%"+req.FilterCompleted+"%")
+		if tx.Error != nil {
+			return nil, fmt.Errorf("Internal Server Error!")
+		}
 	}
 
 	todos := []Todo{}
-	tx = tx.Find(&todos)
+	tx = tx.Order("`order` asc").Find(&todos)
 
 	if tx.Error != nil {
 		return nil, fmt.Errorf("Internal Server Error: %v",tx.Error)
@@ -67,17 +76,6 @@ func (s *Server) DeleteTodo(ctx context.Context, req *todo.TodoDetailRequest) (*
 }
 
 func (s *Server) UpdateTodo(ctx context.Context, req *todo.UpdateTodoRequest) (*todo.Todo, error){
-	if req.Todo.Name != "" {
-		dupTodo := Todo{}
-		tx := s.DB.Where("board_id = ? AND `name` = ?", req.BoardId, req.Todo.Name).Limit(1).Find(&dupTodo)
-		if tx.Error != nil {
-			return nil, fmt.Errorf("Internal Server Error: %v", tx.Error)
-		}
-		if tx.RowsAffected != 0 {
-			return nil, fmt.Errorf("Name is duplicated")
-		}
-	}
-
 	if req.Todo.Order != 0 {
 		dupTodo := Todo{}
 		tx := s.DB.Where("board_id = ? AND `order` = ?", req.BoardId, req.Todo.Order).Limit(1).Find(&dupTodo)
@@ -96,27 +94,15 @@ func (s *Server) UpdateTodo(ctx context.Context, req *todo.UpdateTodoRequest) (*
 	todo := Todo{}
 	todo.FromProto(req.Todo)
 
-	tx := s.DB.Model(&todo).Select(maskes).Where(&Todo{ID: req.Todo.Id, BoardID: req.BoardId}).Updates(&todo)
+	tx := s.DB.Select(maskes).Updates(&todo)
 	if tx.Error != nil {
 		return nil, fmt.Errorf("Internal Server Error: %v",tx.Error)
 	}
-	if tx.RowsAffected == 0 {
-		return nil, fmt.Errorf("Todo not found!")
-	}
-
+	
 	return todo.Proto(), nil
 }
 
 func (s *Server) CreateTodo(ctx context.Context, req *todo.Todo) (*todo.Todo, error) {
-	dupTodo := Todo{}
-	tx := s.DB.Where("board_id = ? AND name = ?", req.BoardId, req.Name).Find(&dupTodo)
-	if tx.Error != nil {
-		return nil, fmt.Errorf("Internal Server Error: %v", tx.Error)
-	}
-	if tx.RowsAffected != 0 {
-		return nil, fmt.Errorf("Name must be unique")
-	}
-
 	var maxOrder int32
 	row := s.DB.Table("todos").Where("board_id = ? ", req.BoardId).Select("MAX(`order`)").Row()
 	err := row.Scan(&maxOrder)
@@ -129,7 +115,7 @@ func (s *Server) CreateTodo(ctx context.Context, req *todo.Todo) (*todo.Todo, er
 	todo.Completed = false
 	todo.Priority = "LOW"
 
-	tx = s.DB.Create(todo)
+	tx := s.DB.Create(todo)
 	if tx.Error != nil {
         return nil, fmt.Errorf("Internal Server Error: %v", tx.Error)
     }
